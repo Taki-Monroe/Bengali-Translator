@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trainer Overview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: 'Open Sans', sans-serif;
+    }
+    .container {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-top: 50px;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .pattern-count {
+      font-size: 3em;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #007bff;
+    }
+    .btn {
+      background-color: #007bff;
+      border-color: #007bff;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .btn:hover {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+    .logout-btn {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 20px;
+      color: #fff;
+      font-family: 'Open Sans', sans-serif;
+    }
+    .logout-btn:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+    }
+    @media (max-width: 576px) {
+      .container {
+        margin-top: 20px;
+        padding: 10px;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .pattern-count {
+        font-size: 2em;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Trainer Overview</h1>
+    <% if (patternCount > 0) { %>
+      <p>Hi <b><%= username %></b>, you have trained <span class="pattern-count"><%= patternCount %></span> patterns for Bengali Transliteration.</p>
+      <a href="/dashboard" class="btn btn-primary btn-block">Go to Dashboard</a>
+    <% } else { %>
+      <p>Hi <b><%= username %></b>, you haven't trained any patterns yet.</p>
+      <a href="/dashboard" class="btn btn-primary btn-block">Add Patterns</a>
+    <% } %>
+    <div class="text-center">
+      <form action="/logout" method="GET">
+        <button type="submit" class="btn logout-btn">Logout</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

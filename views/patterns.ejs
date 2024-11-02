@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Last 50 Patterns</title>
+</head>
+<body>
+  <h1>Last 50 Patterns</h1>
+  <% if (patterns.length === 0) { %>
+    <p>No patterns found.</p>
+  <% } else { %>
+    <ul>
+      <% patterns.forEach((pattern) => { %>
+        <li><%= pattern %></li>
+      <% }); %>
+    </ul>
+  <% } %>
+</body>
+</html>
