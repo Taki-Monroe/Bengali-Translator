@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <header>
+      <meta charset="UTF-8">
+      <title>Bengali Translator</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="path/to/favicon.ico" type="image/x-icon">
+      <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #222;
+        color: #eee;
+    }
+
+    .form-label {
+        font-weight: bold;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #555;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-bottom: 20px;
+        background-color: #333;
+        color: #eee;
+    }
+
+    .form-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .form-button:hover {
+        background-color: #45a049;
+    }
+
+    .result {
+        margin-top: 20px;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+
+    .success {
+        color: green;
+        font-weight: bold;
+    }
+
+    .loading {
+        font-style: italic;
+        color: #999;
+    }
+</style>
+    </header>
+  </head>
+  <body>
+    <h1>Bengali Translator</h1>
+    <h2>Translate Text</h2>
+    <form id="translate-form">
+      <label for="text-input" class="form-label">Enter text to translate:</label>
+      <input type="text" id="text-input" name="text" class="form-input" aria-label="Enter text to translate">
+      <button type="submit" class="form-button">Translate</button>
+    </form>
+    <div id="translate-result" class="result">
+      <p id="translate-loading" class="loading">Translating...</p>
+    </div>
+    <h2>Add Pattern</h2>
+    <form id="add-pattern-form">
+      <label for="code-input" class="form-label">Enter pattern code:</label>
+      <input type="text" id="code-input" name="code" class="form-input">
+      <label for="character-input" class="form-label">Enter pattern character:</label>
+      <input type="text" id="character-input" name="character" class="form-input">
+      <button type="submit" class="form-button">Add Pattern</button>
+    </form>
+    <div id="add-pattern-result" class="result">
+      <p id="add-pattern-loading" class="loading">Adding pattern...</p>
+    </div>
+    <footer>
+      <p>&copy; 2023 Bengali Translator. All rights reserved.</p>
+    </footer>
+    <script>
+      const translateForm = document.getElementById('translate-form');
+      const translateResult = document.getElementById('translate-result');
+      const addPatternForm = document.getElementById('add-pattern-form');
+      const addPatternResult = document.getElementById('add-pattern-result');
+
+      translateForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const text = document.getElementById('text-input').value;
+        translateResult.innerHTML = `<p id="translate-loading" class="loading">Translating...</p>`;
+        fetch(`/translate?text=${encodeURIComponent(text)}`)
+          .then(response => response.json())
+          .then(data => {
+            translateResult.innerHTML = `<p>${data.text}</p>`;
+          })
+          .catch(error => {
+            translateResult.innerHTML = `<p class="error">${error.message}</p>`;
+          });
+      });
+
+      addPatternForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const code = document.getElementById('code-input').value;
+        const character = document.getElementById('character-input').value;
+        addPatternResult.innerHTML = `<p id="add-pattern-loading" class="loading">Adding pattern...</p>`;
+        fetch('/add-pattern', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ code, character })
+        })
+          .then(response => response.json())
+          .then(data => {
+            addPatternResult.innerHTML = `<p class="success">${data.message}</p>`;
+          })
+          .catch(error => {
+            addPatternResult.innerHTML = `<p class="error">${error.message}</p>`;
+          });
+      });
+    </script>
+  </body>
+  </html>
