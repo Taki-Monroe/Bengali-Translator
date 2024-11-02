@@ -1,45 +1,73 @@
 const express = require('express');
-const { translate, addPattern } = require('./translator');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const translationRouter = require('./translation');
+const loginRouter = require('./login');
+const dashboardMiddleware = require('./dashboard');
+const registerRouter = require('./register');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.get('/translate', (req, res) => {
-  const { text } = req.query;
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-  if (!text) {
-    return res.status(400).json({ message: 'Missing required parameter: text' });
+// Set up sessions with longer expiration time for "remember me" functionality
+app.use(session({
+  secret: 'my-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
   }
+}));
 
-  const translatedText = translate(text);
-  res.json({ text: translatedText });
-});
+// Set the view engine to EJS
+app.set('view engine', 'ejs');
 
-app.post('/add-pattern', express.json(), (req, res) => {
-  const { code, character } = req.body;
+// Parse incoming JSON requests
+app.use(express.json());
 
-  if (!code || !character) {
-    return res.status(400).json({ message: 'Missing required parameters: code, character' });
-  }
-
-  const patternExists = checkPatternExists(code);
-
-  if (patternExists) {
-    return res.status(409).json({ message: 'Pattern already exists', status: 'failed' });
-  }
-
-  addPattern(code, character);
-  res.json({ message: 'Pattern added successfully', status: 'success' });
-});
-
-function checkPatternExists(code) {
-  const lowercaseCode = code.toLowerCase();
-  const patterns = require('./patterns.json');
-  return patterns.hasOwnProperty(lowercaseCode);
-}
-
-// Serve the index.html file from the public directory
+// Serve the public directory
 app.use(express.static(__dirname + '/public'));
+
+// Middleware to check if user is logged in
+const requireLogin = (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+};
+
+// Mount the translation router
+app.use('/', translationRouter);
+
+// Mount the login router
+app.use('/login', loginRouter);
+
+// Mount the dashboard middleware with requireLogin middleware
+app.use('/dashboard', requireLogin, dashboardMiddleware);
+
+// Mount the register router
+app.use('/register', registerRouter);
+
+// Logout route
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+    }
+    res.redirect('/login');
+  });
+});
+
+// Redirect root to dashboard if user is logged in, otherwise redirect to login page
+app.get('/', (req, res) => {
+  if (req.session.user) {
+    return res.redirect('/dashboard');
+  }
+  res.redirect('/login');
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
